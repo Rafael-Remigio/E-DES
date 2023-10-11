@@ -37,8 +37,62 @@ by an S-Box
 * The values in each S-Box are the output for a byte-long input.
 * Blocs of 64 so it will be 32 on each slice Li and Ri
 
+* **Feistel Network Transformation**
+    S-Boxes will be used to transform 4-byte values a byte at the time.
+    
+    The algorithm to implement is the following
+    * The output byte in the lowest memory address (offset 0) should be the output of the S-Box for the input byte in the higher memory address (offset 3);
+    * The output byte in the next memory address (offset 1) should be the output of the S-Box for an input with the sum modulo 256 of the two input bytes in the higher memory addresses (offsets 2 and 3);
+    * The output byte in the next memory address (offset 2) should be the output of the S-Box for an input with the sum modulo 256 of the three input bytes in the higher memory addresses (offsets 1, 2 and 3);
+    * The output byte in the highest memory address (offset 3) should be the output of the S-Box for an input with the sum modulo 256 of the four input bytes;
 
+    <img src="images/tranformation-function.png">
+
+    ***S-Box Tranformation/Permutation Code Example***
+    ```
+    uint8_t SBox [256];
+    uint8_t in [4];
+    uint8_t out [4];
+    uint8_t index = in [3];
+    out [0] = sbox [ index ];
+    index = ( index ^ in [2]) ;
+    out [1] = sbox [ index ];
+    index = ( index ^ in [1]) ;
+    out [2] = sbox [ index ];
+    index = ( index ^ in [0]) ;
+    out [3] = sbox [ index ]
+    ```
+
+### Application and Delivery
+
+This is for 2 Diferent Languges
+
+1. **Implementing E-DES in a module or library**
+
+2. **Decrypt and Encrypt Applications**
+
+    * These aplications receive one textual password as argument, which will be used to generate the 256-bit key of E-DES. 
+    * There must be an option available to default to the normal DES
+    * Applications should process the input from stdin
+    * produce a result to stdou
+    * process the input in ECB mode
+    * Use **PKCS#7** padding.
+
+    Results show always be language independent, this is, we should be able to encrypt and decrypt with applications in different languages
+
+3. **Speed Application**
+
+    * Application to evaluate the relative performance of your E-DES implementation
+    and one or more library implementation of DES
+
+    * For that, allocate a 4KiB buffer (a memory page), fill it with random values (you can use /dev/urandom for that), and evaluate the time it takes to encrypt and decrypt the buffer with DES (from the library) and E-DES (both in ECB mode). Perform at least 100 000 measurements of each operation, and present the lowest values observed for each. For each measurement, use new, random keys
+
+    * Use the Linux system call clock_gettime function, which provides a nanosecond precision, this may require a bash script.
 
 ## TODO
 
-Learn how to implement substitution boxes and that sort of permutation
+* Learn how to implement substitution boxes and that sort of permutation
+
+* Search a deterministic shuffling algorithm for the S-Boxes. 
+    * Possibly Fisher-Yates
+
