@@ -95,4 +95,4 @@ This is for 2 Diferent Languges
 
 * Search a deterministic shuffling algorithm for the S-Boxes. 
     * Possibly Fisher-Yates
-
+* Test S-Boxes with Least significant bit (LSB) that the professor gave us

@@ -1,0 +1,9 @@
+# out files that i generate from c compilations
+*.out
+
+# java files as well
+
+*.jar
+*.class
+
+
