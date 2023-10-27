@@ -93,6 +93,17 @@ This is for 2 Diferent Languges
 
 * Learn how to implement substitution boxes and that sort of permutation
 
+* Generate a seed from the key with the a hash function.
+* Use that seed to generate the S Boxes
+* Use some sort of Pseudo random generator to generate integers from the seed.
+* To generate the s boxes i could also used somthing the professore called pbkdf2
+* Instead of using Pseudo random generator I could use multiple hashes as well:
+    * Hash(key,1)
+    * Hash(key,2)
+    * Hash(key,3)
+
 * Search a deterministic shuffling algorithm for the S-Boxes. 
     * Possibly Fisher-Yates
 * Test S-Boxes with Least significant bit (LSB) that the professor gave us
+
+
