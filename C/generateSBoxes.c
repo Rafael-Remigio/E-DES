@@ -53,6 +53,7 @@ char *hexlify(char *bstr) {
     *phstr++ ='\0';
     return hstr;
 }
+// --------------------------------------------------------------------
 
 // Generate vector from Key
 // This vector will be used to shuffle the S-Boxes in a deterministic way
@@ -79,28 +80,28 @@ void generateShuffleVector(char *key,int *vector)
 
 		// Concatente char array with index
 		sprintf(key_with_index, "%.32s%d", key, i);
-		printf("String: %.34s\n", key_with_index);
+		//printf("String: %.34s\n", key_with_index);
 
 		// Generate digest from Key and index
 		// HASH( "kEY+IDX" )
 		SHA256(key_with_index, 34, hash);
 		char *hash_hex = hexlify(hash);
-		printf("Hash: %.64s\n",hash_hex);
+		//printf("Hash: %.64s\n",hash_hex);
 
 		// Turn the char values from the hex_hash into integers. Sum them 4 by 4 to get larger values
 		for (int c = 0; c < 64; c +=  4) {
 
 			// Using absulutes to not have to deal with negative values
 			int value = abs((int) hash_hex[c]) + abs((int) hash_hex[c+1]) + abs((int) hash_hex[c+2]) +abs((int) hash_hex[c+3]) ;
-			printf("Ord: %d, ", value);
+			//printf("Ord: %d, ", value);
 
 
 			// Add this value to the vector
 			vector[counter] = value;
 			counter += 1;
 		}
-		printf("\n");
-		printf("\n");
+		//printf("\n");
+		//printf("\n");
 
 	}
 
@@ -109,9 +110,8 @@ void generateShuffleVector(char *key,int *vector)
 
 
 
-
-int main(int argc, char const *argv[])
-{
+// Function used to test the generation of the vector
+void test_generateVector(){
 
 	char key[32] = "aaaaaaaaabbbbbbbbbbcccccdddddeef";
 
@@ -126,4 +126,16 @@ int main(int argc, char const *argv[])
 		printf("%d, ",vector[i]);
 	}
 	printf("\n");
+
+}
+
+
+
+int main(int argc, char const *argv[])
+{
+
+	char key[32] = "aaaaaaaaabbbbbbbbbbcccccdddddeef";
+
+
+	test_generateVector();
 }
