@@ -29,12 +29,15 @@ void fisherYates ( uint8_t *array , int* vector )
 
 // Generate vector from Key
 // This vector will be used to shuffle the S-Boxes in a deterministic way
-int *generateShuffleVector(char *key)
+void generateShuffleVector(char *key,int *vector)
 {
 	// Key length is 32 bytes
 	int key_length = 32;
-	// Declare key to be incremented
-	char key_with_index[34];
+
+	// Declare key to be concatenated with index
+	// key_length + 2 (intchar) + 1 (null value to end string) = 34
+	char key_with_index[key_length + 3];
+	
 	// Hash value on each iteration
 	char* hash;
 
@@ -42,15 +45,35 @@ int *generateShuffleVector(char *key)
 	hash = malloc(SHA256_DIGEST_LENGTH * sizeof(char));
 
 
-	for (int i = 0; i < 4 ; i ++){
 
+	int counter  = 0;
+	
+	for (int i = 0; i < 16 ; i ++){
 
+		// Concatente char array with index
 		sprintf(key_with_index, "%.32s%d", key, i);
-		printf("%.33s\n", key_with_index);
-		SHA256(key_with_index, 33, hash);
+		printf("String: %.34s\n", key_with_index);
+
+		// Generate digest from Key and index
+		// HASH( "kEY+IDX" )
+		SHA256(key_with_index, 34, hash);
 
 		printf("Hash: %.32s\n",hash);
+
+		for (int c = 0; c < 32; c +=  2) {
+			// Using absulutes to not have to deal with negative values
+			int value = abs((int) hash[c]) + abs((int) hash[c+1]);
+			printf("Ord: %d, ", value);
+
+			vector[counter] = value;
+			counter += 1;
+		}
+		printf("\n");
+		printf("\n");
+
 	}
+
+	return;
 }
 
 
@@ -59,10 +82,16 @@ int *generateShuffleVector(char *key)
 int main(int argc, char const *argv[])
 {
 
-	char key[32] = "aaaaaaaaabbbbbbbbbbcccccdddddddd";
+	char key[32] = "aaaaaaaaabbbbbbbbbbcccccdddddeef";
 
-	printf("%.32s\n", key);
+	printf("Initial key: %.32s\n\n", key);
 
+	// Declare vector array
+	int vector[256];
 
-	generateShuffleVector(key);
+	generateShuffleVector(key, vector);
+
+	for (int i = 0; i < 256 ; i ++){
+		printf("%d, ",vector[i]);
+	}
 }
