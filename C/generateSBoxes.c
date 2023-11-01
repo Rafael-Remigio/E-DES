@@ -27,6 +27,33 @@ void fisherYates ( uint8_t *array , int* vector )
 	}
 }
 
+
+// ------------------- Helper functions to hexlify the char output ------------
+
+int a2v(char c) {
+    if ((c >= '0') && (c <= '9')) return c - '0';
+    if ((c >= 'a') && (c <= 'f')) return c - 'a' + 10;
+    if ((c >= 'A') && (c <= 'F')) return c - 'A' + 10;
+    else return 0;
+}
+
+char v2a(int c) {
+    const char hex[] = "0123456789abcdef";
+    return hex[c];
+}
+
+char *hexlify(char *bstr) {
+    char *hstr=malloc((strlen(bstr)*2)+1);
+    bzero(hstr,(strlen(bstr)*2)+1);
+    char *phstr=hstr;
+    for(int i=0; i<strlen(bstr);i++) {
+        *phstr++ =v2a((bstr[i]>>4)&0x0F);
+        *phstr++ =v2a((bstr[i])&0x0F);
+    }
+    *phstr++ ='\0';
+    return hstr;
+}
+
 // Generate vector from Key
 // This vector will be used to shuffle the S-Boxes in a deterministic way
 void generateShuffleVector(char *key,int *vector)
@@ -57,14 +84,18 @@ void generateShuffleVector(char *key,int *vector)
 		// Generate digest from Key and index
 		// HASH( "kEY+IDX" )
 		SHA256(key_with_index, 34, hash);
+		char *hash_hex = hexlify(hash);
+		printf("Hash: %.64s\n",hash_hex);
 
-		printf("Hash: %.32s\n",hash);
+		// Turn the char values from the hex_hash into integers. Sum them 4 by 4 to get larger values
+		for (int c = 0; c < 64; c +=  4) {
 
-		for (int c = 0; c < 32; c +=  2) {
 			// Using absulutes to not have to deal with negative values
-			int value = abs((int) hash[c]) + abs((int) hash[c+1]);
+			int value = abs((int) hash_hex[c]) + abs((int) hash_hex[c+1]) + abs((int) hash_hex[c+2]) +abs((int) hash_hex[c+3]) ;
 			printf("Ord: %d, ", value);
 
+
+			// Add this value to the vector
 			vector[counter] = value;
 			counter += 1;
 		}
@@ -94,4 +125,5 @@ int main(int argc, char const *argv[])
 	for (int i = 0; i < 256 ; i ++){
 		printf("%d, ",vector[i]);
 	}
+	printf("\n");
 }
