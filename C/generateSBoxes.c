@@ -17,7 +17,7 @@ void swap(uint8_t *a, uint8_t *b) {
 // It also has linear time complexity, and O(1) space complexity.
 void fisherYates ( uint8_t *array , int* vector )
 {
-	int i , j ;
+	int i  ;
 	int swapper = 0;
 	int size =  256 * 16;
 	for ( i = 0; i < size; i ++) {
