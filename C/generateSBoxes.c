@@ -61,14 +61,14 @@ char *hexlify(char *bstr) {
 
 // Generate vector from Key
 // This vector will be used to shuffle the S-Boxes in a deterministic way
-void generateShuffleVector(char *key,int *vector)
+void generateShuffleVector(char *seed,int *vector)
 {
 	// Key length is 32 bytes
-	int key_length = 32;
+	int seed_length = 32;
 
-	// Declare key to be concatenated with index
-	// key_length + 2 (intchar) + 1 (null value to end string) = 34
-	char key_with_index[key_length + 4];
+	// Declare seed to be concatenated with index
+	// seed_length + 2 (intchar) + 1 (null value to end string) = 34
+	char seed_with_index[seed_length + 4];
 	
 	// Hash value on each iteration
 	char* hash;
@@ -83,12 +83,12 @@ void generateShuffleVector(char *key,int *vector)
 	for (int i = 0; i < 256 ; i ++){
 
 		// Concatente char array with index
-		sprintf(key_with_index, "%.32s%d", key, i);
-		//printf("String: %.35s\n", key_with_index);
+		sprintf(seed_with_index, "%.32s%d", seed, i);
+		//printf("String: %.35s\n", seed_with_index);
 
 		// Generate digest from Key and index
 		// HASH( "KEY+IDX" )
-		SHA256(key_with_index, 35, hash);
+		SHA256(seed_with_index, 35, hash);
 		char *hash_hex = hexlify(hash);
 		//printf("Hash: %.64s\n",hash_hex);
 
@@ -136,13 +136,13 @@ uint8_t box[] = {0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0
 int main(int argc, char const *argv[])
 {
 
-	char key[32] = "aaaaaaaaabbbbbbbbbbcccccdddddeef";
+	char seed[32] = "aaaaaaaaabbbbbbbbbbcccccdddddeef";
 
 	int vector[256*16];
 
-	printf("Initial key: %.32s\n\n", key);
+	printf("Initial seed: %.32s\n\n", seed);
 
-	generateShuffleVector(key, vector);
+	generateShuffleVector(seed, vector);
 
 	printf("Shuffling Vector: [ ");
 

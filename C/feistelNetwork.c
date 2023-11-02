@@ -60,7 +60,7 @@ void feistel(uint8_t *firstSlice, uint8_t *secondSlice, uint8_t sbox[256]) {
         secondSlice[i] ^= firstSlice[i];
     }
 
-
+    // copy firtslice to the correct position
     memcpy(firstSlice, newFirstSlice, 4);
 
     return;
