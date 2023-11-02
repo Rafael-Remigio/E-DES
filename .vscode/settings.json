@@ -1,0 +1,6 @@
+{
+    "files.associations": {
+        "ctype.h": "c",
+        "getopt.h": "c"
+    }
+}
