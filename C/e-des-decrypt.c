@@ -315,34 +315,46 @@ int main(int argc, char *argv[])
     char ch;
     int input_index = 0;
 
+    // This is stupid but works
+    bool firstBlock = true;
+
     while(read(STDIN_FILENO, &ch, 1) > 0)
     {
+
+        if (input_index == 0  && !firstBlock){
+            printf("%.8s",data);
+        }
+
 
         // add to block
         data[input_index] = ch;
         input_index++;
+        // Again this is stupig way to deal with this
+        // but don't know how stdin works in c
+        firstBlock = false;
 
-        if (input_index == 8) {
-            // preform encryption
-            feistelRounds(data,true,shuffledSboxes);
-            
-            // print block as stdout
-            printf("%.8s",data);
-            input_index = 0;
-        }
+
+            if (input_index == 8) {
+                // preform decrytion
+                feistelRounds(data,false,shuffledSboxes);
+                
+                // print block as stdout
+                input_index = 0;
+
+            }
+        
+        
+        
 
     }
 
-    // Calculate needed padding
-    int padding_value = 8 - input_index;
-    // PKCS#7 padding
-    for (int i = 7 ; i >= input_index ; i--){
-        data[i] = (uint8_t) padding_value;
+    // Remove the padding
+    uint8_t padding = data[7];
+    for( int i = 0 ; i < 8 - padding; i ++ ){
+        printf("%c",data[i]);
     }
-    // preform encryption on the final block
-    feistelRounds(data,true,shuffledSboxes);
     
-    // print block as stdout
-    printf("%.8s",data);
 
+
+    // Remove the padding
 }
