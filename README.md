@@ -1,5 +1,5 @@
 # E-DES
-Enhanced DES (E-DES), a exploration on creating a variant of DES
+Enhanced DES (E-DES), an exploration on creating a variant of DES
 
 
 ## C code
