@@ -16,15 +16,25 @@ $ echo "hacker mindset baby" | ./e-des-encrypt.out -p password | ./e-des-decrypt
 hacker mindset baby
 ```
 
-```
-// E-DES Mode
 
+### E-DES Mode
+```
 $ echo "hacker mindset" | ./e-des-encrypt.out -p password 
 ���4#���
 !~{�b
+```
+```
+$ echo "hacker mindset baby" | ./e-des-encrypt.out -p password | ./e-des-decrypt.out -p password
+hacker mindset baby
+```
 
-// DES Mode
-
+### DES Mode
+```
 $ echo "hacker mindset" | ./e-des-encrypt.out -p password -d
 X�{�H��a�/#t�W
+```
+
+```
+echo "hacker mindset" | ./e-des-encrypt.out -p password -d | ./e-des-decrypt.out -p password -d
+hacker mindset
 ```

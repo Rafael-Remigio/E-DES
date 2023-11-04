@@ -6,6 +6,8 @@
 #include <stdbool.h>
 #include <getopt.h>
 #include <unistd.h>
+#include <openssl/des.h>
+
 
 uint8_t BOX[] = {0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0c,0x0d,0x0e,0x0f,0x10,0x11,0x12,0x13,0x14,0x15,0x16,0x17,0x18,0x19,0x1a,0x1b,0x1c,0x1d,0x1e,0x1f,0x20,0x21,0x22,0x23,0x24,0x25,0x26,0x27,0x28,0x29,0x2a,0x2b,0x2c,0x2d,0x2e,0x2f,0x30,0x31,0x32,0x33,0x34,0x35,0x36,0x37,0x38,0x39,0x3a,0x3b,0x3c,0x3d,0x3e,0x3f,0x40,0x41,0x42,0x43,0x44,0x45,0x46,0x47,0x48,0x49,0x4a,0x4b,0x4c,0x4d,0x4e,0x4f,0x50,0x51,0x52,0x53,0x54,0x55,0x56,0x57,0x58,0x59,0x5a,0x5b,0x5c,0x5d,0x5e,0x5f,0x60,0x61,0x62,0x63,0x64,0x65,0x66,0x67,0x68,0x69,0x6a,0x6b,0x6c,0x6d,0x6e,0x6f,0x70,0x71,0x72,0x73,0x74,0x75,0x76,0x77,0x78,0x79,0x7a,0x7b,0x7c,0x7d,0x7e,0x7f,0x80,0x81,0x82,0x83,0x84,0x85,0x86,0x87,0x88,0x89,0x8a,0x8b,0x8c,0x8d,0x8e,0x8f,0x90,0x91,0x92,0x93,0x94,0x95,0x96,0x97,0x98,0x99,0x9a,0x9b,0x9c,0x9d,0x9e,0x9f,0xa0,0xa1,0xa2,0xa3,0xa4,0xa5,0xa6,0xa7,0xa8,0xa9,0xaa,0xab,0xac,0xad,0xae,0xaf,0xb0,0xb1,0xb2,0xb3,0xb4,0xb5,0xb6,0xb7,0xb8,0xb9,0xba,0xbb,0xbc,0xbd,0xbe,0xbf,0xc0,0xc1,0xc2,0xc3,0xc4,0xc5,0xc6,0xc7,0xc8,0xc9,0xca,0xcb,0xcc,0xcd,0xce,0xcf,0xd0,0xd1,0xd2,0xd3,0xd4,0xd5,0xd6,0xd7,0xd8,0xd9,0xda,0xdb,0xdc,0xdd,0xde,0xdf,0xe0,0xe1,0xe2,0xe3,0xe4,0xe5,0xe6,0xe7,0xe8,0xe9,0xea,0xeb,0xec,0xed,0xee,0xef,0xf0,0xf1,0xf2,0xf3,0xf4,0xf5,0xf6,0xf7,0xf8,0xf9,0xfa,0xfb,0xfc,0xfd,0xfe,0xff};
 
@@ -251,15 +253,19 @@ int main(int argc, char *argv[])
 {
 
     char *password = NULL;
+    bool e_des_mode = true;
 
     // GETOPS
     int opt; 
-    while((opt = getopt(argc, argv, "p:")) != -1)  
+    while((opt = getopt(argc, argv, "dp:")) != -1)  
     {  
         switch(opt)  
         {  
             case 'p':  
                 password = optarg;
+                break;  
+            case 'd':  
+                e_des_mode = false;
                 break;  
             case ':':  
                 printf("option needs a value\n");  
@@ -271,90 +277,150 @@ int main(int argc, char *argv[])
     }  
     
 
-
-    //Generate seed from key
-
-    char seed[32];
-
-    SHA256(password, strlen(password), seed);
-
-
-	int vector[256*16];
-
-	generateShuffleVector(seed, vector);
-
-	// Create base SBox array
-	uint8_t sboxes[256*16];
-	int counter = 0;
-	for (int i = 0; i < 16 ; i ++){
-		for (int j = 0; j < 256; j++){
-			sboxes[counter] = BOX[j];
-			counter++;
-		}
-	}
-
-	fisherYates(sboxes,vector);
-
-	uint8_t shuffledSboxes[16][256];
-
-	counter = 0;
-	for (int i = 0; i < 16 ; i ++){
-
-		for (int j = 0; j < 256; j++){
-            shuffledSboxes[i][j] = sboxes[counter];
-			counter++;
-		}
-	}
+    if (e_des_mode){
 
 
 
+        //Generate seed from key
 
-    uint8_t data[8];
+        char seed[32];
+
+        SHA256(password, strlen(password), seed);
 
 
-    char ch;
-    int input_index = 0;
+	    int vector[256*16];
 
-    // This is stupid but works
-    bool firstBlock = true;
+	    generateShuffleVector(seed, vector);
 
-    while(read(STDIN_FILENO, &ch, 1) > 0)
-    {
+	    // Create base SBox array
+	    uint8_t sboxes[256*16];
+	    int counter = 0;
+	    for (int i = 0; i < 16 ; i ++){
+	    	for (int j = 0; j < 256; j++){
+	    		sboxes[counter] = BOX[j];
+	    		counter++;
+	    	}
+	    }
 
-        if (input_index == 0  && !firstBlock){
-            printf("%.8s",data);
+	    fisherYates(sboxes,vector);
+
+	    uint8_t shuffledSboxes[16][256];
+
+	    counter = 0;
+	    for (int i = 0; i < 16 ; i ++){
+
+	    	for (int j = 0; j < 256; j++){
+                shuffledSboxes[i][j] = sboxes[counter];
+	    		counter++;
+	    	}
+	    }
+
+
+
+
+        uint8_t data[8];
+
+
+        char ch;
+        int input_index = 0;
+
+        // This is stupid but works
+        bool firstBlock = true;
+
+        while(read(STDIN_FILENO, &ch, 1) > 0)
+        {
+
+            if (input_index == 0  && !firstBlock){
+                printf("%.8s",data);
+            }
+
+
+            // add to block
+            data[input_index] = ch;
+            input_index++;
+            // Again this is stupig way to deal with this
+            // but don't know how stdin works in c
+            firstBlock = false;
+
+
+                if (input_index == 8) {
+                    // preform decrytion
+                    feistelRounds(data,false,shuffledSboxes);
+
+                    // print block as stdout
+                    input_index = 0;
+
+                }
+
+
+
+
         }
 
-
-        // add to block
-        data[input_index] = ch;
-        input_index++;
-        // Again this is stupig way to deal with this
-        // but don't know how stdin works in c
-        firstBlock = false;
-
-
-            if (input_index == 8) {
-                // preform decrytion
-                feistelRounds(data,false,shuffledSboxes);
-                
-                // print block as stdout
-                input_index = 0;
-
-            }
-        
-        
-        
-
-    }
-
-    // Remove the padding
-    uint8_t padding = data[7];
-    for( int i = 0 ; i < 8 - padding; i ++ ){
-        printf("%c",data[i]);
-    }
+        // Remove the padding
+        uint8_t padding = data[7];
+        for( int i = 0 ; i < 8 - padding; i ++ ){
+            printf("%c",data[i]);
+        }
     
+    }
+    else {
+
+        DES_cblock key;
+        DES_key_schedule key_schedule;
+
+        // Initialize the key
+        DES_string_to_key("your_key", &key);
+
+        // Create the key schedule
+        DES_set_key(&key, &key_schedule);
+
+        char data[8];
+        char clearText[8];
+
+        char ch;
+        int input_index = 0;
+
+        // This is stupid but works
+        bool firstBlock = true;
 
 
-    // Remove the padding
+        while(read(STDIN_FILENO, &ch, 1) > 0)
+        {
+
+            if (input_index == 0  && !firstBlock){
+                printf("%.8s",clearText);
+            }
+
+
+            // add to block
+            data[input_index] = ch;
+            input_index++;
+            // Again this is stupig way to deal with this
+            // but don't know how stdin works in c
+            firstBlock = false;
+
+
+                if (input_index == 8) {
+                    // preform decrytion
+                    DES_ecb_encrypt((const_DES_cblock *)data, (DES_cblock *)clearText, &key_schedule, DES_DECRYPT);                
+
+                    // print block as stdout
+                    input_index = 0;
+
+                }
+
+
+
+
+        }
+
+        // Remove the padding
+        uint8_t padding = clearText[7];
+        for( int i = 0 ; i < 8 - padding; i ++ ){
+            printf("%c",clearText[i]);
+        }
+
+    }
+
 }
