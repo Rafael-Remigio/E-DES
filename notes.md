@@ -103,12 +103,12 @@ This is for 2 Diferent Languges
     * Possibly Fisher-Yates
 * Test S-Boxes with Least significant bit (LSB) that the professor gave us
 * Generate a seed from the key with the a hash function.
+* Padding
+* Receive Input
 
 
 ## TODO
 
 * Encryption Tool
 * Decryption Tool
-* Receive Input
-* Padding
 
