@@ -29,7 +29,7 @@ void fisherYates ( uint8_t *array , int* vector )
 		// Get next value to be swapped, Fisher Yates algorithm
 		swapper = vector[i] % ( size -i);
 		// Swap last value with value on another position
-		swap(&array[swapper], &array[size-i]);
+		swap(&array[swapper], &array[size-i-1]);
 	}
 }
 

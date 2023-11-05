@@ -32,7 +32,7 @@ void fisherYates ( uint8_t *array , int* vector )
 		// Get next value to be swapped, Fisher Yates algorithm
 		swapper = vector[i] % ( size -i);
 		// Swap last value with value on another position
-		swap(&array[swapper], &array[size-i]);
+		swap(&array[swapper], &array[size-i-1]);
 	}
 }
 
@@ -248,45 +248,6 @@ void generateShuffleVector(char *seed,int *vector)
 	return;
 }
 
-void updateFileWithNewTime(int newTime, const char *filePath) {
-    FILE *filePointer;
-    int previousTime;
-
-    // Open the file in read mode to read the previous time value
-    filePointer = fopen(filePath, "r");
-    if (filePointer != NULL) {
-        // Read the previous time from the file
-        fscanf(filePointer, "%d", &previousTime);
-        fclose(filePointer);
-
-        // Compare with the new time value
-        if (newTime < previousTime) {
-            // Open the file in write mode to overwrite with new time
-            filePointer = fopen(filePath, "w");
-            if (filePointer != NULL) {
-                // Write the new time value to the file
-                fprintf(filePointer, "%d", newTime);
-                fclose(filePointer);
-                printf("File updated with new time: %d\n", newTime);
-            } else {
-                printf("Error opening the file for writing.\n");
-            }
-        } else {
-            printf("New time is not less than the previous time. File remains unchanged.\n");
-        }
-    } else {
-        // If the file does not exist, create it and write the new time
-        filePointer = fopen(filePath, "w");
-        if (filePointer != NULL) {
-            fprintf(filePointer, "%d", newTime);
-            fclose(filePointer);
-            printf("File created with initial time: %d\n", newTime);
-        } else {
-            printf("Error opening the file for writing.\n");
-        }
-    }
-}
-
 
 int main(int argc, char *argv[])
 {
@@ -365,11 +326,6 @@ int main(int argc, char *argv[])
         char ch;
         int input_index = 0;
 
-        //
-        struct timespec start, end;
-        double elapsed;
-        clock_gettime(CLOCK_MONOTONIC, &start);
-
 
         while(read(STDIN_FILENO, &ch, 1) > 0)
         {
@@ -399,18 +355,6 @@ int main(int argc, char *argv[])
         feistelRounds(data,true,shuffledSboxes);
         
 
-        // Get the current time again
-        clock_gettime(CLOCK_MONOTONIC, &end);
-
-        // Calculate the elapsed time in seconds with nanosecond precision
-        elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec);
-
-
-
-        const char *filePath = "edes_encrypt.txt";
-        updateFileWithNewTime(elapsed, filePath);
-
-
         // print block as stdout
         printf("%.8s",data);
     }
@@ -434,10 +378,6 @@ int main(int argc, char *argv[])
         int input_index = 0;
 
 
-        // Get the current time with nanosecond precision
-        struct timespec start, end;
-        double elapsed;
-        clock_gettime(CLOCK_MONOTONIC, &start);
 
         while(read(STDIN_FILENO, &ch, 1) > 0)
         {
@@ -467,15 +407,6 @@ int main(int argc, char *argv[])
         DES_ecb_encrypt((const_DES_cblock *)data, (DES_cblock *)ciphertext, &key_schedule, DES_ENCRYPT);        
         
 
-        // Get the current time again
-        clock_gettime(CLOCK_MONOTONIC, &end);
-
-        // Calculate the elapsed time in seconds with nanosecond precision
-        elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec);
-
-
-        const char *filePath = "des_encrypt.txt";
-        updateFileWithNewTime(elapsed, filePath);
 
 
         // print block as stdout

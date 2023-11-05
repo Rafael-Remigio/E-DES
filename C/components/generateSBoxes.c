@@ -4,12 +4,6 @@
 #include <stdlib.h>
 #include <string.h>
 
-// Swap Function to help with the Shufling algorithm
-void swap(uint8_t *a, uint8_t *b) {
-    uint8_t temp = *a;
-    *a = *b;
-    *b = temp;
-}
 
 
 // Fisher Yates Algorithm
@@ -17,14 +11,18 @@ void swap(uint8_t *a, uint8_t *b) {
 // It also has linear time complexity, and O(1) space complexity.
 void fisherYates ( uint8_t *array , int* vector )
 {
-	int i  ;
+	int i;
 	int swapper = 0;
 	int size =  256 * 16;
 	for ( i = 0; i < size; i ++) {
 		// Get next value to be swapped, Fisher Yates algorithm
-		swapper = vector[i] % ( size -i);
+		swapper = vector[i] % ( size -i );
 		// Swap last value with value on another position
-		swap(&array[swapper], &array[size-i]);
+
+		uint8_t temp = array[swapper];
+		array[swapper] = array[size-i-1];
+		array[size-i-1] = temp;
+ 
 	}
 }
 
@@ -83,7 +81,7 @@ void generateShuffleVector(char *seed,int *vector)
 	for (int i = 0; i < 256 ; i ++){
 
 		// Concatente char array with index
-		sprintf(seed_with_index, "%.32s%d", seed, i);
+		sprintf(seed_with_index, "%.32s%.3d", seed, i);
 		//printf("String: %.35s\n", seed_with_index);
 
 		// Generate digest from Key and index
@@ -136,7 +134,7 @@ uint8_t box[] = {0x00,0x01,0x02,0x03,0x04,0x05,0x06,0x07,0x08,0x09,0x0a,0x0b,0x0
 int main(int argc, char const *argv[])
 {
 
-	char seed[32] = "aaaaaaaaabbbbbbbbbbcccccdddddeef";
+	char seed[32] = "aaaaaaaabbbbbbbbbbbcccccdddddeff";
 
 	int vector[256*16];
 
