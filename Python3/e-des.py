@@ -163,20 +163,20 @@ if __name__ == "__main__":
         single_box = []
 
 
-    dataString = "hackings";
+    dataString = "hacking!";
     data = []
 
     for i in range(len(dataString)):
         data.append(uint8_t(ord(dataString[i])))
 
-    print("ClearText data:",  data)
+    print("ClearText data:",  dataString)
 
     cipherData = feistelRounds(data,True,SBOXES);
 
-    print(cipherData)
+    print("CipherText data:",''.join(format(value.value,'#x') for value in cipherData))
 
 
 
     clearText = feistelRounds(cipherData,False,SBOXES);
 
-    print("ClearText data:", clearText)
+    print("ClearText data:",''.join(chr(value.value) for value in clearText))

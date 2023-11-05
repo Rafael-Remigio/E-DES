@@ -330,7 +330,7 @@ int main(int argc, char *argv[])
 
 
 
-    uint8_t data[8] = "hacking";
+    uint8_t data[8] = "hacking!";
 
     printf("ClearText data:  ");
     for (int i = 0 ; i < 8 ; i++){
