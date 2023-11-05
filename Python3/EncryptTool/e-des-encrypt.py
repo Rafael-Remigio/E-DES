@@ -1,7 +1,7 @@
 import ctypes
 import hashlib
-import sys
-
+import getopt, sys
+import binascii
 import argparse
 uint8_t = ctypes.c_uint8
 
@@ -108,75 +108,91 @@ def feistelRounds(data,isEncrypting,SBOXES):
             second_slice, first_slice = feistel(second_slice,first_slice,SBOXES[i]);
 
         return  first_slice + second_slice
-
+    
 
 if __name__ == "__main__":
 
     parser = argparse.ArgumentParser()
-    parser.add_argument("-p", "--password", type=str, help="Password to encrypt and decrypt")
+    parser.add_argument("-p", "--password", type=str, help="Password to encrypt")
+    parser.add_argument("-d", "--des",  action='store_true', help="Use DES mode")
 
     args = parser.parse_args()
 
     password = args.password
+    des_mode = args.des
 
-    print("Password:", password);
 
-    # This is very stupid, I hate python
-    password_bytes = b''
-    for char in password:
-        password_bytes += uint8_t(ord(char))
+    if (not des_mode):
+        # This is very stupid, I hate python
+        password_bytes = b''
+        for char in password:
+            password_bytes += uint8_t(ord(char))
 
+
+        hash_obj = hashlib.sha256(password_bytes)
+        password_hash_bytes = hash_obj.digest()
+        password_hash_hex = hash_obj.hexdigest()
+
+
+
+
+        vector = generate_shuffle_vector(password_hash_bytes)
     
-    hash_obj = hashlib.sha256(password_bytes)
-    password_hash_bytes = hash_obj.digest()
-    password_hash_hex = hash_obj.hexdigest()
 
-    print("Shuffling seed (in hex):",password_hash_hex)
+        base_Sbox = [0] * 256*16
+        counter = 0
+        for i in range(16):
+            for j in range(256):
+                base_Sbox[counter] = BOX[j]
+                counter+=1
 
+        s_boxes = fisher_yates(base_Sbox,vector);
 
-
-    vector = generate_shuffle_vector(password_hash_bytes)
-    print("Shuffle Vector:" ,vector)
-
-
-    base_Sbox = [0] * 256*16
-    counter = 0
-    for i in range(16):
-        for j in range(256):
-            base_Sbox[counter] = BOX[j]
-            counter+=1
-    
-    s_boxes = fisher_yates(base_Sbox,vector);
-
-    SBOXES = []
-    single_box = []
-    counter = 0
-    print("Scrambled Sboxes: [");
-    for i in range(16):
-        print("Sbox " + str(i+1) +" : [ ",end="")
-        for j in range(256):
-            single_box.append(uint8_t(s_boxes[counter]))
-            print(format(s_boxes[counter], '#x'), " ,", end="")
-            counter+=1
-        print("]")
-        SBOXES.append(single_box)
+        SBOXES = []
         single_box = []
+        counter = 0
+        for i in range(16):
+            for j in range(256):
+                single_box.append(uint8_t(s_boxes[counter]))
+                counter+=1
+            SBOXES.append(single_box)
+            single_box = []
 
 
-    dataString = "hacking!";
-    data = []
+        data = [0]*8
+        input_index = 0
+        full_data = sys.stdin.buffer.read()
+        byte_array = bytearray()
+        for ch in full_data:
+            # add to block
+            data[input_index] = uint8_t(ch)
+            input_index+=1
 
-    for i in range(len(dataString)):
-        data.append(uint8_t(ord(dataString[i])))
+            if (input_index == 8):
+                # preform encryption
+                cipher_data = feistelRounds(data,True,SBOXES);
+                
 
-    print("ClearText data:",  dataString)
+                # print block as stdout
+                for value in cipher_data:
+                    byte_array.append(value.value) 
 
-    cipherData = feistelRounds(data,True,SBOXES);
+                input_index = 0;
+            
+        
+        # Calculate needed padding
+        padding_value = 8 - input_index
+        
+        # PKCS#7 padding
+        for i in range(7, input_index - 1, -1):
+            data[i] = uint8_t(padding_value)
+        
+        # Perform encryption on the final block using feistelRounds function
+        cipher_data = feistelRounds(data, True, SBOXES)
+        
 
-    print("CipherText data:",''.join(format(value.value,'#x') for value in cipherData))
+        ##print block as stdout
+        for value in cipher_data:
+            byte_array.append(value.value ) 
 
-
-
-    clearText = feistelRounds(cipherData,False,SBOXES);
-
-    print("ClearText data:",''.join(chr(value.value) for value in clearText))
+        print(binascii.hexlify(byte_array).decode(),end="")

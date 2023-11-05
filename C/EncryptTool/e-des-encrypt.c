@@ -339,7 +339,7 @@ int main(int argc, char *argv[])
                 feistelRounds(data,true,shuffledSboxes);
                 
                 // print block as stdout
-                printf("%.8s",data);
+                printf("%.16s",hexlify(data,8));
                 input_index = 0;
             }
 
@@ -356,7 +356,7 @@ int main(int argc, char *argv[])
         
 
         // print block as stdout
-        printf("%.8s",data);
+        printf("%.16s",hexlify(data,8));
     }
 
     // Preform encryption with normal des

@@ -318,8 +318,8 @@ int main(int argc, char *argv[])
 
 
 
-
-        uint8_t data[8];
+        char *data;
+        uint8_t data_hex[8];
 
 
         char ch;
@@ -338,14 +338,15 @@ int main(int argc, char *argv[])
 
 
             // add to block
-            data[input_index] = ch;
+            data_hex[input_index] = ch;
             input_index++;
             // Again this is stupig way to deal with this
             // but don't know how stdin works in c
             firstBlock = false;
 
 
-                if (input_index == 8) {
+                if (input_index == 16) {
+                    data = unhexlify(data_hex,16);
                     // preform decrytion
                     feistelRounds(data,false,shuffledSboxes);
 
@@ -362,7 +363,6 @@ int main(int argc, char *argv[])
         // Remove the padding
         uint8_t padding = data[7];
 
-        
 
         for( int i = 0 ; i < 8 - padding; i ++ ){
             printf("%c",data[i]);
