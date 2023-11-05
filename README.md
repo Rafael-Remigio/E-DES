@@ -90,3 +90,14 @@ ClearText data: hacking!
 CipherText data: 0xc00x520x90xf90xc20x6b0x850xf3
 ClearText data: hacking!
 ```
+
+
+## Cross language compatibility
+
+```
+$ echo "random collection of letter and chars" | ./C/EncryptTool/e-des-encrypt.out -p password | python3 Python3/DecryptTool/e-des-decrypt.py -p password
+random collection of letter and chars
+
+$ echo "random collection of letter and chars" | python3 Python3/EncryptTool/e-des-encrypt.py -p password | ./C/DecryptTool/e-des-decrypt.out -p password
+random collection of letter and chars
+```
