@@ -199,7 +199,7 @@ void generateShuffleVector(char *seed,int *vector)
 	for (int i = 0; i < 256 ; i ++){
 
 		// Concatente char array with index
-		sprintf(seed_with_index, "%.32s%d", seed, i);
+		sprintf(seed_with_index, "%.32s%.3d", seed, i);
 		//printf("String: %.35s\n", seed_with_index);
 
 		// Generate digest from Key and index

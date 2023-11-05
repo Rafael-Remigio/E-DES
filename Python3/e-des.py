@@ -1,8 +1,8 @@
-
 import ctypes
 import hashlib
+import getopt, sys
 
-
+import argparse
 uint8_t = ctypes.c_uint8
 
 
@@ -25,22 +25,22 @@ def fisher_yates(array, vector):
 
 
 
-def generate_shuffle_vector(seed):
-    seed_with_index = seed + "{:03d}"
+def generate_shuffle_vector(base_seed_bytes):
+    string_index = "{:03d}"
     vector = []
 
 
     for i in range(256):
-        seed_indexed = seed_with_index.format(i)
+        seed_indexed = string_index.format(i)
         
 
         # This is very stupid, I hate python
-        seedBytes = b''
+        seed_bytes = base_seed_bytes
+
         for char in seed_indexed:
-            seedBytes += uint8_t(ord(char))
+            seed_bytes += uint8_t(ord(char))
 
-
-        hash_obj = hashlib.sha256(seedBytes)
+        hash_obj = hashlib.sha256(seed_bytes)
         hash_hex = hash_obj.hexdigest()
         #print(seed_indexed)
         #print(hash_hex)
@@ -54,23 +54,91 @@ def generate_shuffle_vector(seed):
     return vector
 
 
+
+def preform_sbox_transformation(sbox, in_data):
+    out = [0] * 4
+
+
+    index = in_data[3].value % 256
+    out[0] = sbox[index]
+    # This is such a stupid line of code
+    # I hate python.
+    # The issue is that I can sum bytes in python, so i sum tem and them get the modulu by 256
+    # unsupported operand type(s) for +: 'c_ubyte' and 'c_ubyte'
+    
+    index = (index + in_data[2].value) % 256
+    out[1] = sbox[index]
+    index = (index + int.from_bytes(in_data[1],byteorder='little')) % 256
+    out[2] = sbox[index]
+    index = (index + int.from_bytes(in_data[0],byteorder='little')) % 256
+    out[3] = sbox[index]
+
+    return out
+
+
+def feistel(first_slice, second_slice, sbox):
+
+    new_first_slice = second_slice[:]
+
+    second_slice = preform_sbox_transformation(sbox, second_slice)
+
+
+    for i in range(4):
+        result = second_slice[i].value ^ first_slice[i].value
+        second_slice[i] = uint8_t(result)
+
+
+    return new_first_slice,second_slice
+
+
+def feistelRounds(data,isEncrypting,SBOXES):
+
+    first_slice = data[:4]
+    second_slice = data[4:]
+
+    # Encrypt
+    if (isEncrypting):
+        for i in range(16):
+            first_slice, second_slice = feistel(first_slice,second_slice,SBOXES[i]);
+
+    # Decrypt
+    else:
+        for i in range(15,0,-1):
+            first_slice, second_slice = feistel(first_slice,second_slice,SBOXES[i]);
+
+
+
+    new_data =  first_slice + second_slice 
+    return new_data
+
+
+
 if __name__ == "__main__":
 
-    seedString = "aaaaaaaabbbbbbbbbbbcccccdddddeff";
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-p", "--password", type=str, help="Password to encrypt and decrypt")
 
-    seed = [0] * 32
+    args = parser.parse_args()
 
-    index = 0;
-    for char in seedString:
-        seed[index] = uint8_t(ord(char))
-        index+=1
+    password = args.password
 
-    vector = [0] *256*16
+    print("Password:", password);
 
-    print("Initial seed:", ''.join(chr(x.value) for x in seed));
+    # This is very stupid, I hate python
+    password_bytes = b''
+    for char in password:
+        password_bytes += uint8_t(ord(char))
+
+    
+    hash_obj = hashlib.sha256(password_bytes)
+    password_hash_bytes = hash_obj.digest()
+    password_hash_hex = hash_obj.hexdigest()
+
+    print("Shuffling seed (in hex):",password_hash_hex)
 
 
-    vector = generate_shuffle_vector(seedString)
+
+    vector = generate_shuffle_vector(password_hash_bytes)
     print("Shuffle Vector:" ,vector)
 
 
@@ -91,4 +159,3 @@ if __name__ == "__main__":
             print(format(s_boxes[counter], '#x'), " ,", end="")
             counter+=1
         print("]")    
-    
