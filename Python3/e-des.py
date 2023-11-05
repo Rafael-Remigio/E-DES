@@ -101,16 +101,13 @@ def feistelRounds(data,isEncrypting,SBOXES):
         for i in range(16):
             first_slice, second_slice = feistel(first_slice,second_slice,SBOXES[i]);
 
+        return  first_slice + second_slice 
     # Decrypt
     else:
-        for i in range(15,0,-1):
-            first_slice, second_slice = feistel(first_slice,second_slice,SBOXES[i]);
+        for i in range(15,-1,-1):
+            second_slice, first_slice = feistel(second_slice,first_slice,SBOXES[i]);
 
-
-
-    new_data =  first_slice + second_slice 
-    return new_data
-
+        return  first_slice + second_slice
 
 
 if __name__ == "__main__":
@@ -151,11 +148,35 @@ if __name__ == "__main__":
     
     s_boxes = fisher_yates(base_Sbox,vector);
 
+    SBOXES = []
+    single_box = []
     counter = 0
     print("Scrambled Sboxes: [");
     for i in range(16):
         print("Sbox " + str(i+1) +" : [ ",end="")
         for j in range(256):
+            single_box.append(uint8_t(s_boxes[counter]))
             print(format(s_boxes[counter], '#x'), " ,", end="")
             counter+=1
-        print("]")    
+        print("]")
+        SBOXES.append(single_box)
+        single_box = []
+
+
+    dataString = "hackings";
+    data = []
+
+    for i in range(len(dataString)):
+        data.append(uint8_t(ord(dataString[i])))
+
+    print("ClearText data:",  data)
+
+    cipherData = feistelRounds(data,True,SBOXES);
+
+    print(cipherData)
+
+
+
+    clearText = feistelRounds(cipherData,False,SBOXES);
+
+    print("ClearText data:", clearText)

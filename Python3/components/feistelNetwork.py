@@ -69,15 +69,14 @@ def feistelRounds(data,isEncrypting):
         for i in range(16):
             first_slice, second_slice = feistel(first_slice,second_slice,SBOXES[i]);
 
+        return  first_slice + second_slice 
     # Decrypt
     else:
-        for i in range(15,0,-1):
-            first_slice, second_slice = feistel(first_slice,second_slice,SBOXES[i]);
+        for i in range(15,-1,-1):
+            second_slice, first_slice = feistel(second_slice,first_slice,SBOXES[i]);
 
+        return  first_slice + second_slice
 
-
-    new_data =  first_slice + second_slice 
-    return new_data
 
 
 
@@ -107,4 +106,10 @@ if __name__ == "__main__":
 
         cipherTextString = ''.join(format(x.value, '02x') for x in cipherData)
 
-        print("Cleartext:" + str(clearTextString) + "\tCipherText:" +  str(cipherTextString) )
+        decyphered = feistelRounds(cipherData,False);
+
+        decypheredTextString = ''.join(format(x.value, '02x') for x in decyphered)
+
+
+        print("Cleartext:" + str(clearTextString) + "\tCipherText:" +  str(cipherTextString) + "\tClearText:" + str(decypheredTextString) )
+
