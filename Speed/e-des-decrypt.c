@@ -426,17 +426,24 @@ int main(int argc, char *argv[])
     }
     else {
 
-        DES_cblock key;
+       DES_cblock key;
         DES_key_schedule key_schedule;
+        
+        char seed[32];
+        
 
-        // Initialize the key
-        DES_string_to_key("your_key", &key);
+        SHA256(password, strlen(password), seed);
+
+        memcpy(key, seed, 8 * sizeof(uint8_t));
+
 
         // Create the key schedule
         DES_set_key(&key, &key_schedule);
 
-        char data[8];
+
+        char *data;
         char clearText[8];
+        uint8_t data_hex[8];
 
         char ch;
         int input_index = 0;
@@ -445,6 +452,7 @@ int main(int argc, char *argv[])
         bool firstBlock = true;
 
 
+        clock_gettime(CLOCK_MONOTONIC, &start);
         while(read(STDIN_FILENO, &ch, 1) > 0)
         {
 
@@ -478,7 +486,7 @@ int main(int argc, char *argv[])
         // Remove the padding
         uint8_t padding = clearText[7];
 
-          clock_gettime(CLOCK_MONOTONIC, &end);
+        clock_gettime(CLOCK_MONOTONIC, &end);
 
         // Calculate the elapsed time in seconds with nanosecond precision
         elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec);

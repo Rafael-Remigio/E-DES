@@ -421,17 +421,25 @@ int main(int argc, char *argv[])
         DES_cblock key;
         DES_key_schedule key_schedule;
 
-        // Initialize the key
-        DES_string_to_key("your_key", &key);
+
+        char seed[32];
+        
+
+        SHA256(password, strlen(password), seed);
+
+        memcpy(key, seed, 8 * sizeof(uint8_t));
 
         // Create the key schedule
         DES_set_key(&key, &key_schedule);
+
 
         char data[8];
         char ciphertext[8];
 
         char ch;
         int input_index = 0;
+
+
 
 
         // Get the current time with nanosecond precision
@@ -470,8 +478,7 @@ int main(int argc, char *argv[])
         // Get the current time again
         clock_gettime(CLOCK_MONOTONIC, &end);
 
-        // Calculate the elapsed time in seconds with nanosecond precision
-        elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec);
+         elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec);
 
 
         const char *filePath = "c_des_encrypt.txt";

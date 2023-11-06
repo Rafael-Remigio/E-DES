@@ -16,7 +16,7 @@ generate_password() {
     echo "$password"
 }
 
-for i in {1..100}
+for i in {1..10}
 do
 clear
 echo -n "$i/100"
