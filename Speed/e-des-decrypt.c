@@ -262,7 +262,7 @@ void updateFileWithNewTime(int newTime, const char *filePath) {
         fclose(filePointer);
 
         // Compare with the new time value
-        if (newTime < previousTime) {
+        if (newTime < previousTime && newTime > 0) {
             // Open the file in write mode to overwrite with new time
             filePointer = fopen(filePath, "w");
             if (filePointer != NULL) {
@@ -319,7 +319,7 @@ int main(int argc, char *argv[])
     }  
     
     struct timespec start, end;
-    double elapsed;
+    double elapsed = 0;
 
     if (e_des_mode){
 
@@ -413,7 +413,7 @@ int main(int argc, char *argv[])
         // Calculate the elapsed time in seconds with nanosecond precision
         elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec);
 
-        const char *filePath = "edes_decrypt.txt";
+        const char *filePath = "c_edes_decrypt.txt";
         updateFileWithNewTime(elapsed, filePath);
 
 
@@ -485,7 +485,7 @@ int main(int argc, char *argv[])
 
 
 
-        const char *filePath = "des_decrypt.txt";
+        const char *filePath = "c_des_decrypt.txt";
         updateFileWithNewTime(elapsed, filePath);
 
 
