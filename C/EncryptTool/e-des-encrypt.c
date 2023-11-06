@@ -365,11 +365,17 @@ int main(int argc, char *argv[])
         DES_cblock key;
         DES_key_schedule key_schedule;
 
-        // Initialize the key
-        DES_string_to_key("your_key", &key);
+
+        char seed[32];
+        
+
+        SHA256(password, strlen(password), seed);
+
+        memcpy(key, seed, 8 * sizeof(uint8_t));
 
         // Create the key schedule
         DES_set_key(&key, &key_schedule);
+
 
         char data[8];
         char ciphertext[8];
@@ -391,7 +397,7 @@ int main(int argc, char *argv[])
                 DES_ecb_encrypt((const_DES_cblock *)data, (DES_cblock *)ciphertext, &key_schedule, DES_ENCRYPT);                
                 
                 // print block as stdout
-                printf("%.8s",ciphertext);
+                printf("%.16s",hexlify(ciphertext,8));
                 input_index = 0;
             }
 
@@ -410,7 +416,7 @@ int main(int argc, char *argv[])
 
 
         // print block as stdout
-        printf("%.8s",ciphertext);
+        printf("%.16s",hexlify(ciphertext,8));
 
     }
 }

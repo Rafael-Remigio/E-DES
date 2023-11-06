@@ -3,6 +3,10 @@ import hashlib
 import getopt, sys
 import binascii
 import argparse
+from Crypto.Cipher import DES
+from Crypto.Random import get_random_bytes
+
+
 uint8_t = ctypes.c_uint8
 
 
@@ -196,3 +200,44 @@ if __name__ == "__main__":
             byte_array.append(value.value ) 
 
         print(binascii.hexlify(byte_array).decode(),end="")
+
+    else: 
+        
+        password_bytes = b''
+        for char in password:
+            password_bytes += uint8_t(ord(char))
+
+
+        hash_obj = hashlib.sha256(password_bytes)
+        password_hash_bytes = hash_obj.digest()
+        password_hash_hex = hash_obj.hexdigest()
+        
+
+        # Create a DES cipher object in ECB mode
+        cipher = DES.new(password_hash_bytes[:8],DES.MODE_ECB)
+
+        data = [0]*8
+        input_index = 0
+        full_data = sys.stdin.buffer.read()
+
+        byte_array = bytearray()
+        full_data_array = bytearray()
+        for value in full_data:
+            input_index+=1
+            full_data_array.append(uint8_t(value).value) 
+            if (input_index == 8):
+                input_index = 0
+
+        # Calculate needed padding
+        padding_value = 8 - input_index
+        
+        # PKCS#7 padding
+        for i in range(7, input_index - 1, -1):
+            full_data_array.append(uint8_t(padding_value).value)
+        
+
+        cipher_data = cipher.encrypt(full_data_array);
+        
+
+        print(binascii.hexlify(cipher_data).decode(),end="")
+

@@ -374,15 +374,22 @@ int main(int argc, char *argv[])
 
         DES_cblock key;
         DES_key_schedule key_schedule;
+        
+        char seed[32];
+        
 
-        // Initialize the key
-        DES_string_to_key("your_key", &key);
+        SHA256(password, strlen(password), seed);
+
+        memcpy(key, seed, 8 * sizeof(uint8_t));
+
 
         // Create the key schedule
         DES_set_key(&key, &key_schedule);
 
-        char data[8];
+
+        char *data;
         char clearText[8];
+        uint8_t data_hex[8];
 
         char ch;
         int input_index = 0;
@@ -400,14 +407,15 @@ int main(int argc, char *argv[])
 
 
             // add to block
-            data[input_index] = ch;
+            data_hex[input_index] = ch;
             input_index++;
             // Again this is stupig way to deal with this
             // but don't know how stdin works in c
             firstBlock = false;
 
 
-                if (input_index == 8) {
+                if (input_index == 16) {
+                    data = unhexlify(data_hex,16);
                     // preform decrytion
                     DES_ecb_encrypt((const_DES_cblock *)data, (DES_cblock *)clearText, &key_schedule, DES_DECRYPT);                
 

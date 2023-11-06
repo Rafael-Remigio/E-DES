@@ -105,10 +105,11 @@ This is for 2 Diferent Languges
 * Generate a seed from the key with the a hash function.
 * Padding
 * Receive Input
-
+* Encryption Tool 
+* Decryption Tool
 
 ## TODO
 
-* Encryption Tool
-* Decryption Tool
 
+* DES Mode in python
+* Speed tool in both languages

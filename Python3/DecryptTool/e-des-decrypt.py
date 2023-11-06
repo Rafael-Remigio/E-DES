@@ -3,6 +3,9 @@ import hashlib
 import getopt, sys
 import binascii
 import argparse
+from Crypto.Cipher import DES
+from Crypto.Random import get_random_bytes
+
 uint8_t = ctypes.c_uint8
 
 
@@ -172,11 +175,11 @@ if __name__ == "__main__":
 
             if (input_index == 8):
                 # preform encryption
-                cipher_data = feistelRounds(data,False,SBOXES);
+                plain_text_data = feistelRounds(data,False,SBOXES);
                 
 
                 # print block as stdout
-                for value in cipher_data:
+                for value in plain_text_data:
                     byte_array.append(value.value) 
                 input_index = 0;
             
@@ -189,13 +192,38 @@ if __name__ == "__main__":
             data[i] = uint8_t(padding_value)
         
         # Perform encryption on the final block using feistelRounds function
-        cipher_data = feistelRounds(data, False, SBOXES)
+        plain_text_data = feistelRounds(data, False, SBOXES)
         
 
         ##print block as stdout
-        padding = cipher_data[7].value;
+        padding = plain_text_data[7].value;
 
         for i in range( 8 - padding):
             byte_array.append(value.value ) 
 
         print(byte_array.decode(),end="")
+
+    else:
+
+        line = sys.stdin.readline()
+        data = binascii.unhexlify(line)
+        
+        password_bytes = b''
+        for char in password:
+            password_bytes += uint8_t(ord(char))
+
+
+        hash_obj = hashlib.sha256(password_bytes)
+        password_hash_bytes = hash_obj.digest()
+        password_hash_hex = hash_obj.hexdigest()
+        
+
+        # Create a DES cipher object in ECB mode
+        cipher = DES.new(password_hash_bytes[:8],DES.MODE_ECB)
+
+        # Decrypt the data
+        decrypted = cipher.decrypt(data)
+        
+        ##print block as stdout
+
+        print(decrypted.decode(),end="")
