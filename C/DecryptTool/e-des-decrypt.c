@@ -186,7 +186,7 @@ void generateShuffleVector(char *seed,int *vector)
 	int seed_length = 32;
 
 	// Declare seed to be concatenated with index
-	// seed_length + 2 (intchar) + 1 (null value to end string) = 34
+	// seed_length + 3 (integer char) + 1 (null value to end string) = 34
 	char seed_with_index[seed_length + 4];
 	
 	// Hash value on each iteration
