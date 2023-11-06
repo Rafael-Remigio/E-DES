@@ -11,6 +11,7 @@ In order to test the performance of our approach, E-DES is implemented in two di
 
 ### Feistel Networks
 
+Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 ```
 void feistelRounds(uint8_t data[8],bool isEncrypting, uint8_t SBOXES[16][256]){
@@ -42,7 +43,7 @@ The 4098 byte sized values are shuffled deterministically using a shuffling vect
 Key generated from password using SHA256
 
 **Shufling Vector from key**
-To generate the 4098 **pseudo-random** values from the 256 bit key, we used SHA-256 hash function. The key is concatenated with integer values from 0 to 255 and hashed. From each 256 bit hash value we generate 16 integers and add them to the vector. The ideia was to create something similar to Hash_DRBG. The big issue is that Hash_DRBG requires reseeding, something we did not implement given the small ammount of hashes conducted and the fact that the values generated are not reflected directly on the ciphertext.
+To generate the 4098 **pseudo-random** values from the 256 bit key, we used SHA-256 hash function. The key is concatenated with integer values from 0 to 255 and hashed. From each 256 bit hash value we generate 16 integers and add them to the vector. The ideia was to create something similar to Hash_DRBG. Hash_DRBG requires reseeding in order to avoid cycles or the discovery of the seed, something we did not implement given the small ammount of hashes used and the fact that the values generated are not reflected directly on the ciphertext.
 
 ```
 // Key length is 32 bytes
@@ -97,6 +98,25 @@ void fisherYates ( uint8_t *array , int* vector )
 
 ### Padding
 
+
+```
+// Remove the padding
+uint8_t padding = clearText[7]
+for( int i = 0 ; i < 8 - padding; i ++ ){
+    printf("%c",clearText[i]);
+}
+
+// Add padding to last block
+int padding_value = 8 - input_index;
+// PKCS#7 padding
+for (int i = 7 ; i >= input_index ; i--){
+    data[i] = (uint8_t) padding_value;
+}
+```
+
+## Implementation
+
+Implementing this is Pyhon3 proved to be challenging, and incredibly ineficient compared to the normal DES, on C however implementation was much easier. Another problem I ran to was language compatability with stdout and Pyhton3's ridiculous encoding.
 
 ## Conclusion
 

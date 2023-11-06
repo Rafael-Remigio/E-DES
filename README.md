@@ -65,6 +65,10 @@ hacker mindset
 ## Python3
 
 ```
+pip install pycryptodome
+```
+
+```
 $ python3 e-des.py -p password
 Password: password
 Shuffling seed (in hex): 5e884898da28047151d0e56f8dc6292773603d0d6aabbdd62a11ef721d1542d8
