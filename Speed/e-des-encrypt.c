@@ -260,7 +260,7 @@ void updateFileWithNewTime(int newTime, const char *filePath) {
         fclose(filePointer);
 
         // Compare with the new time value
-        if (newTime < previousTime) {
+        if ((newTime < previousTime)  && (newTime > 0)) {
             // Open the file in write mode to overwrite with new time
             filePointer = fopen(filePath, "w");
             if (filePointer != NULL) {
@@ -367,7 +367,7 @@ int main(int argc, char *argv[])
 
         //
         struct timespec start, end;
-        double elapsed;
+        double elapsed = 0;
         clock_gettime(CLOCK_MONOTONIC, &start);
 
 
@@ -407,7 +407,7 @@ int main(int argc, char *argv[])
 
 
 
-        const char *filePath = "edes_encrypt.txt";
+        const char *filePath = "c_edes_encrypt.txt";
         updateFileWithNewTime(elapsed, filePath);
 
 
@@ -436,7 +436,7 @@ int main(int argc, char *argv[])
 
         // Get the current time with nanosecond precision
         struct timespec start, end;
-        double elapsed;
+        double elapsed = 0;
         clock_gettime(CLOCK_MONOTONIC, &start);
 
         while(read(STDIN_FILENO, &ch, 1) > 0)
@@ -474,7 +474,7 @@ int main(int argc, char *argv[])
         elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec);
 
 
-        const char *filePath = "des_encrypt.txt";
+        const char *filePath = "c_des_encrypt.txt";
         updateFileWithNewTime(elapsed, filePath);
 
 
