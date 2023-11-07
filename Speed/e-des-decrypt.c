@@ -425,8 +425,7 @@ int main(int argc, char *argv[])
     
     }
     else {
-
-       DES_cblock key;
+        DES_cblock key;
         DES_key_schedule key_schedule;
         
         char seed[32];
@@ -441,7 +440,7 @@ int main(int argc, char *argv[])
         DES_set_key(&key, &key_schedule);
 
 
-        char *data;
+        char data[8];
         char clearText[8];
         uint8_t data_hex[8];
 
@@ -451,8 +450,8 @@ int main(int argc, char *argv[])
         // This is stupid but works
         bool firstBlock = true;
 
-
         clock_gettime(CLOCK_MONOTONIC, &start);
+
         while(read(STDIN_FILENO, &ch, 1) > 0)
         {
 
@@ -486,21 +485,23 @@ int main(int argc, char *argv[])
         // Remove the padding
         uint8_t padding = clearText[7];
 
-        clock_gettime(CLOCK_MONOTONIC, &end);
-
-        // Calculate the elapsed time in seconds with nanosecond precision
-        elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec);
-
-
-
-        const char *filePath = "c_des_decrypt.txt";
-        updateFileWithNewTime(elapsed, filePath);
 
 
         for( int i = 0 ; i < 8 - padding; i ++ ){
             printf("%c",clearText[i]);
         }
 
+    
+        // Get the current time again
+        clock_gettime(CLOCK_MONOTONIC, &end);
+
+        elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec);
+
+
+        const char *filePath = "c_des_decrypt.txt";
+        updateFileWithNewTime(elapsed, filePath);
+
     }
 
 }
+

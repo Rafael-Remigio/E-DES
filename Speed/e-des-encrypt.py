@@ -125,17 +125,16 @@ def update_file_with_new_time(new_time, file_path):
             with open(file_path, 'w') as file_pointer:
                 # Write the new time value to the file
                 file_pointer.write(str(new_time))
-                print(f"File updated with new time: {new_time}")
-        else:
-            print("New time is not less than the previous time. File remains unchanged.")
+                #print(f"File updated with new time: {new_time}")
+            #print("New time is not less than the previous time. File remains unchanged.")
     except FileNotFoundError:
         # If the file does not exist, create it and write the new time
         with open(file_path, 'w') as file_pointer:
             file_pointer.write(str(new_time))
-            print(f"File created with initial time: {new_time}")
+            #print(f"File created with initial time: {new_time}")
     except Exception as e:
-        print(f"Error: {e}")
-
+        #print(f"Error: {e}")
+        pass
 
 if __name__ == "__main__":
 
@@ -267,15 +266,14 @@ if __name__ == "__main__":
         for i in range(7, input_index - 1, -1):
             full_data_array.append(uint8_t(padding_value).value)
         
-
         start_time =  time.perf_counter_ns()
 
         cipher_data = cipher.encrypt(full_data_array);
-        
+
         end_time = time.perf_counter_ns()
         execution_time_ns = end_time - start_time
         file_path = "python_des_enc_time.txt"
-        update_file_with_new_time(execution_time_ns, file_path)
+        update_file_with_new_time(execution_time_ns, file_path)      
 
         print(binascii.hexlify(cipher_data).decode(),end="")
 

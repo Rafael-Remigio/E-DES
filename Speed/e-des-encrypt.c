@@ -202,7 +202,7 @@ void generateShuffleVector(char *seed,int *vector)
 	for (int i = 0; i < 256 ; i ++){
 
 		// Concatente char array with index
-		sprintf(seed_with_index, "%.32s%d", seed, i);
+		sprintf(seed_with_index, "%.32s%.3d", seed, i);
 		//printf("String: %.35s\n", seed_with_index);
 
 		// Generate digest from Key and index
@@ -247,6 +247,7 @@ void generateShuffleVector(char *seed,int *vector)
 
 	return;
 }
+
 
 void updateFileWithNewTime(int newTime, const char *filePath) {
     FILE *filePointer;
@@ -361,7 +362,6 @@ int main(int argc, char *argv[])
         //
         clock_gettime(CLOCK_MONOTONIC, &start);
 
-
         while(read(STDIN_FILENO, &ch, 1) > 0)
         {
 
@@ -374,6 +374,7 @@ int main(int argc, char *argv[])
                 feistelRounds(data,true,shuffledSboxes);
                 
                 // print block as stdout
+                printf("%.8s",data);
                 input_index = 0;
             }
 
@@ -388,6 +389,8 @@ int main(int argc, char *argv[])
         // preform encryption on the final block
         feistelRounds(data,true,shuffledSboxes);
         
+        
+        printf("%.8s",data);
 
         // Get the current time again
         clock_gettime(CLOCK_MONOTONIC, &end);
@@ -445,7 +448,8 @@ int main(int argc, char *argv[])
             if (input_index == 8) {
                 // preform encryption
                 DES_ecb_encrypt((const_DES_cblock *)data, (DES_cblock *)ciphertext, &key_schedule, DES_ENCRYPT);                
-                
+                printf("%.8s",data);
+
                 // print block as stdout
                 input_index = 0;
             }
@@ -460,12 +464,13 @@ int main(int argc, char *argv[])
         }
         // preform encryption on the final block
         DES_ecb_encrypt((const_DES_cblock *)data, (DES_cblock *)ciphertext, &key_schedule, DES_ENCRYPT);        
-        
+        printf("%.8s",data);
+
 
         // Get the current time again
         clock_gettime(CLOCK_MONOTONIC, &end);
 
-         elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec);
+        elapsed = (end.tv_sec - start.tv_sec) + (end.tv_nsec - start.tv_nsec);
 
 
         const char *filePath = "c_des_encrypt.txt";

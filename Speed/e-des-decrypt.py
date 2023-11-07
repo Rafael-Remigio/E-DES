@@ -124,17 +124,16 @@ def update_file_with_new_time(new_time, file_path):
             with open(file_path, 'w') as file_pointer:
                 # Write the new time value to the file
                 file_pointer.write(str(new_time))
-                print(f"File updated with new time: {new_time}")
-        else:
-            print("New time is not less than the previous time. File remains unchanged.")
+                #print(f"File updated with new time: {new_time}")
+            #print("New time is not less than the previous time. File remains unchanged.")
     except FileNotFoundError:
         # If the file does not exist, create it and write the new time
         with open(file_path, 'w') as file_pointer:
             file_pointer.write(str(new_time))
-            print(f"File created with initial time: {new_time}")
+            #print(f"File created with initial time: {new_time}")
     except Exception as e:
-        print(f"Error: {e}")
-
+        #print(f"Error: {e}")
+        pass
 
 if __name__ == "__main__":
 
@@ -235,7 +234,7 @@ if __name__ == "__main__":
         update_file_with_new_time(execution_time_ns, file_path)
         
 
-        print(byte_array.decode(),end="")
+        #print(byte_array.decode(),end="")
 
     else:
 
@@ -267,4 +266,4 @@ if __name__ == "__main__":
         
         ##print block as stdout
 
-        print(decrypted.decode(),end="")
+        #print(decrypted.decode(),end="")

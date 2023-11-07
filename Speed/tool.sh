@@ -24,16 +24,16 @@ echo -n "$i/1.000"
 
 # generate random password
 temp_password=$(generate_password)
-cat random_buffer | ./edes_enc.out -p "$temp_password" > /dev/null | ./edes_dec.out -p "$temp_password" > /dev/null
+cat random_buffer | ./edes_enc.out -p "$temp_password"  | ./edes_dec.out -p "$temp_password" > /dev/null
 
 temp_password=$(generate_password)
-cat random_buffer  | ./edes_enc.out -p "$temp_password" -d > /dev/null | ./edes_dec.out -p "$temp_password" -d > /dev/null
+cat random_buffer  | ./edes_enc.out -p "$temp_password" -d  | ./edes_dec.out -p "$temp_password" -d > /dev/null
 
 # run python code in both modes
 temp_password=$(generate_password)
-cat random_buffer | python3 e-des-encrypt.py -p "$temp_password" > /dev/null| python3 e-des-decrypt.py -p "$temp_password" > /dev/null
+cat random_buffer | python3 e-des-encrypt.py -p "$temp_password" | python3 e-des-decrypt.py -p "$temp_password" > /dev/null
 temp_password=$(generate_password)
-cat random_buffer | python3 e-des-encrypt.py -p "$temp_password" -d > /dev/null| python3 e-des-decrypt.py -p "$temp_password" -d > /dev/null
+cat random_buffer | python3 e-des-encrypt.py -p "$temp_password" -d | python3 e-des-decrypt.py -p "$temp_password" -d > /dev/null
 
 
 done
