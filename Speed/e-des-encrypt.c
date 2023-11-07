@@ -32,7 +32,7 @@ void fisherYates ( uint8_t *array , int* vector )
 		// Get next value to be swapped, Fisher Yates algorithm
 		swapper = vector[i] % ( size -i);
 		// Swap last value with value on another position
-		swap(&array[swapper], &array[size-i]);
+		swap(&array[swapper], &array[size-i-1]);
 	}
 }
 
@@ -267,12 +267,7 @@ void updateFileWithNewTime(int newTime, const char *filePath) {
                 // Write the new time value to the file
                 fprintf(filePointer, "%d", newTime);
                 fclose(filePointer);
-                printf("File updated with new time: %d\n", newTime);
-            } else {
-                printf("Error opening the file for writing.\n");
             }
-        } else {
-            printf("New time is not less than the previous time. File remains unchanged.\n");
         }
     } else {
         // If the file does not exist, create it and write the new time
@@ -280,9 +275,6 @@ void updateFileWithNewTime(int newTime, const char *filePath) {
         if (filePointer != NULL) {
             fprintf(filePointer, "%d", newTime);
             fclose(filePointer);
-            printf("File created with initial time: %d\n", newTime);
-        } else {
-            printf("Error opening the file for writing.\n");
         }
     }
 }
@@ -318,7 +310,8 @@ int main(int argc, char *argv[])
 
 
     
-
+    struct timespec start, end;
+    double elapsed = 0;
 
     // E-DES Encryption
     if (e_des_mode){
@@ -366,8 +359,6 @@ int main(int argc, char *argv[])
         int input_index = 0;
 
         //
-        struct timespec start, end;
-        double elapsed = 0;
         clock_gettime(CLOCK_MONOTONIC, &start);
 
 
@@ -383,7 +374,6 @@ int main(int argc, char *argv[])
                 feistelRounds(data,true,shuffledSboxes);
                 
                 // print block as stdout
-                printf("%.8s",data);
                 input_index = 0;
             }
 
@@ -411,8 +401,7 @@ int main(int argc, char *argv[])
         updateFileWithNewTime(elapsed, filePath);
 
 
-        // print block as stdout
-        printf("%.8s",data);
+        
     }
 
     // Preform encryption with normal des
@@ -443,8 +432,7 @@ int main(int argc, char *argv[])
 
 
         // Get the current time with nanosecond precision
-        struct timespec start, end;
-        double elapsed = 0;
+        
         clock_gettime(CLOCK_MONOTONIC, &start);
 
         while(read(STDIN_FILENO, &ch, 1) > 0)
@@ -459,7 +447,6 @@ int main(int argc, char *argv[])
                 DES_ecb_encrypt((const_DES_cblock *)data, (DES_cblock *)ciphertext, &key_schedule, DES_ENCRYPT);                
                 
                 // print block as stdout
-                printf("%.8s",ciphertext);
                 input_index = 0;
             }
 
@@ -486,7 +473,6 @@ int main(int argc, char *argv[])
 
 
         // print block as stdout
-        printf("%.8s",ciphertext);
 
     }
 }
