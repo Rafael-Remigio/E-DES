@@ -120,3 +120,30 @@ Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor i
 $ echo "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum." | python3 Python3/EncryptTool/e-des-encrypt.py -p randomPass -d | ./C/DecryptTool/e-des-decrypt.out -p randomPass -d
 Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 ```
+
+
+### Speed Tool
+
+
+```
+$ ./tool.sh
+```
+
+Results for 10 tries with a random buffer and random keys. Time is nano seconds
+```
+C-DES:
+Encrypt: 2805293
+Decrypt: 2616006
+
+C-EDES:
+Encrypt: 2765834
+Decrypt: 4271651
+
+Python-DES:
+Encrypt: 938051
+Decrypt: 923074
+
+Python-EDES:
+Encrypt: 26981408
+Decrypt: 31150124
+```

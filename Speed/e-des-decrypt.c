@@ -269,12 +269,12 @@ void updateFileWithNewTime(int newTime, const char *filePath) {
                 // Write the new time value to the file
                 fprintf(filePointer, "%d", newTime);
                 fclose(filePointer);
-                printf("File updated with new time: %d\n", newTime);
+                //printf("File updated with new time: %d\n", newTime);
             } else {
-                printf("Error opening the file for writing.\n");
+                //printf("Error opening the file for writing.\n");
             }
         } else {
-            printf("New time is not less than the previous time. File remains unchanged.\n");
+            //printf("New time is not less than the previous time. File remains unchanged.\n");
         }
     } else {
         // If the file does not exist, create it and write the new time
@@ -282,9 +282,9 @@ void updateFileWithNewTime(int newTime, const char *filePath) {
         if (filePointer != NULL) {
             fprintf(filePointer, "%d", newTime);
             fclose(filePointer);
-            printf("File created with initial time: %d\n", newTime);
+            //printf("File created with initial time: %d\n", newTime);
         } else {
-            printf("Error opening the file for writing.\n");
+            //printf("Error opening the file for writing.\n");
         }
     }
 }
