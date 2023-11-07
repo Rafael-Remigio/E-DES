@@ -1,5 +1,115 @@
 # E-DES
-Enhanced DES (E-DES), an exploration on creating a variant of DES
+
+The primary objective of this project is to develop an upgraded iteration of the Data Encryption Standard (DES), named E-DES. We seek to address two key shortcomings of DES: the algorithm's inherent software performance inefficiencies and the limited key size. To achieve these objectives, we will retain the fundamental cipher architecture of DES while departing from its traditional reliance on permutations, expansion, and key mixing. Instead, we will utilize a 256-bit key to generate key-dependent S-Boxes and perform only substitution on each Feistel iteration. Another concern with DES, and its use of static S-Boxes, was the existence of a possible backdoor.
+
+In order to test the performance of our approach, E-DES is implemented in two different programming languages, a high-level language and a low-level language. The programming languages selected were Python and C, respectively. Encryption and decryption are possible using both DES and E-DES in the tools provided in both languages. These tools take a textual password as an argument and use it to generate the 256-bit key for E-DES and the 56-bit key for DES. The only cipher mode implemented is ECB, and the block size is 64 bits.
+
+
+## Cipher Architecture
+
+The Feistel networks consists of 16 rounds, where the input data block is divided into two equal halves (32 bits each). Substitutions are then applied at the right most half. The left most half is XORed with the substituted right most half, and this is the new right block. The unchanged right block becomes the left block.
+```
+void feistel(uint8_t *firstSlice, uint8_t *secondSlice, uint8_t sbox[256]) {
+    uint8_t newFirstSlice[4];
+    // Switch position between slices
+    // Ri to Li+1
+    memcpy(newFirstSlice, secondSlice, 4);
+    // Pemutate and XOR
+    preformSBoxTransformation(sbox,secondSlice);
+    for ( int i = 0 ; i < 4 ; i++){
+        secondSlice[i] ^= firstSlice[i];
+    }
+    // copy firtslice to the correct position
+    memcpy(firstSlice, newFirstSlice, 4);
+    return;
+}
+
+void feistelRounds(uint8_t data[8], bool isEncrypting, uint8_t SBOXES[16][256]){
+    // Slices from 8 bytes of data, 4 bytes each
+    uint8_t slice1[4], slice2[4];
+    // ...
+    if (isEncrypting){
+        for( int i = 0 ; i < 16; i ++ ){
+            feistel(slice1, slice2, SBOXES[i]);
+        }
+    }
+    // If it is decryption, do the rounds the other way
+    else {
+        for( int i = 16 - 1 ; i >= 0; i -- ){
+            feistel(slice2, slice1, SBOXES[i]);
+        }
+    }
+    // ...
+}
+```
+
+### S-Boxes
+
+The 16 S-Boxes used in the Feistel network must be different and pseudo-randomly generated. The 16 S-Boxes don't need to contain the same set of values, but across the 16 S-Boxes, the 4096 values must be equally distributed. What this means is that, for example, one S-Box may have 3 zeros and another 5 eights, but in the totality, the S-Boxes must have exactly 16 zeros and 16 eights.
+
+The 4098 byte-sized values are shuffled deterministically using a shuffling vector of the same size. The 256-bit key is used to generate this vector.
+
+### Key generation 
+
+The 256-bit key is generated from the password using the hashing function SHA-256.
+
+### Shuffling Vector from key
+To generate the 4098 pseudo-random values from the 256-bit key, we used the SHA-256 hash function. The key is concatenated with integer values from 0 to 255 and hashed. From each 256-bit hash value, we generate 16 integers and add them to the vector. The idea was to create something similar to the random bit generator described NIST SP 800-90A (Hash\_DRBG). This kind of pseudorandom generator construction is usually recommended to implement reseeding, something we did not implement given the small amount of hashes used and the fact that the values generated are not reflected directly in the ciphertext.
+```
+
+// Key length is 32 bytes
+int seed_length = 32;
+
+// Declare seed to be concatenated with index
+// 32 + 3 (integer char) + 1(null value to end string)
+char seed_with_index[seed_length + 4];
+
+// Hash value on each iteration
+char* hash;
+
+for (int i = 0; i < 256; i ++){
+    // Concatenate char array with index
+    sprintf(seed_with_index, "%.32s%.3d", seed, i);
+
+    // Generate digest from Key and index
+    // HASH( "KEY+IDX" )
+    SHA256(seed_with_index, 35, hash);
+}
+```
+
+### Fisher Yates:
+
+The deterministic shuffling algorithm used is the Fisher–Yates shuffle. Given a list and a vector of random integers with the same size, we move through the list backward and swap between the current element of the list and the remainder of the corresponding element of the vector divided by the index of the element of the list.
+
+```
+// Swap Function to help with the Shuffling algorithm
+void swap(uint8_t *a, uint8_t *b) {
+    uint8_t temp = *a;
+    *a = *b;
+    *b = temp;
+}
+
+// Fisher Yates Algorithm
+// It allows us to shuffle with a deterministic vector
+// It also has linear time complexity, and O(1) space complexity.
+void fisherYates (uint8_t *array, int* vector)
+{
+    int i;
+    int swapper = 0;
+    int size = 256 * 16;
+    for (i = 0; i < size; i ++) {
+        // Get the next value to be swapped, Fisher Yates algorithm
+        swapper = vector[i] % (size - i);
+        // Swap the last value with the value on another position
+        swap(&array[swapper], &array[size-i-1]);
+    }
+}
+```
+
+### Padding
+
+
+PKCS\#7 padding is used. This means that the value of the bytes added on the last block is equal to the size of the padding. If the byte size of the input is divisible by the block size, we add an entire block of padding.
 
 
 ## C
