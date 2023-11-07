@@ -99,11 +99,11 @@ ClearText data: hacking!
 ## Cross language compatibility
 
 ```
-$ echo "random collection of letter and chars" | ./C/EncryptTool/e-des-encrypt.out -p password | python3 Python3/DecryptTool/e-des-decrypt.py -p password
-random collection of letter and chars
+$ echo "random collection of letters and hello world" | ./C/EncryptTool/e-des-encrypt.out -p password | python3 Python3/DecryptTool/e-des-decrypt.py -p password
+random collection of letter and hello world
 
-$ echo "random collection of letter and chars" | python3 Python3/EncryptTool/e-des-encrypt.py -p password | ./C/DecryptTool/e-des-decrypt.out -p password
-random collection of letter and chars
+$ echo "random collection of letters and hello world" | python3 Python3/EncryptTool/e-des-encrypt.py -p password | ./C/DecryptTool/e-des-decrypt.out -p password
+random collection of letter and hello world
 ```
 
 ### E-DES Mode
