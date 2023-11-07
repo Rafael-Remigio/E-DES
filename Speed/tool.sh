@@ -1,6 +1,6 @@
 #compile the c code
-gcc -O3 -o edes_enc.out e-des-encrypt.c -lssl -lcrypto && chmod +x edes_enc.out  
-gcc -O3 -o edes_dec.out e-des-decrypt.c -lssl -lcrypto  && chmod +x edes_dec.out 
+gcc  -o edes_enc.out e-des-encrypt.c -lssl -lcrypto && chmod +x edes_enc.out  
+gcc  -o edes_dec.out e-des-decrypt.c -lssl -lcrypto  && chmod +x edes_dec.out 
 
 #create random values
 dd if=/dev/urandom of=random_buffer bs=4K count=1
@@ -16,10 +16,10 @@ generate_password() {
     echo "$password"
 }
 
-for i in {1..100}
+for i in {1..10}
 do
 clear
-echo -n "$i/100"
+echo -n "$i/1.000"
 # run c code in both modes
 
 # generate random password
